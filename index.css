@@ -1,44 +1,323 @@
+label.lable-txt {
+  color: #333;
+  font-size: 16px;
+  font: sans-serif;
+  font-weight: 600;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.ddd {
+  background-color: #61dafb;
+}
+
+.App-header {
+  background-color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+}
+
+#localityid {
+  color: #282c34;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.autocomplete {
+  background: #fff;
+  font-size: 10px;
+  position: relative;
+  z-index: 99;
+  left: 0;
+  top: 0;
+  /* min-width: 236px; */
+  max-height: 300px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  box-shadow: 0px 4px 10px 1px rgb(0 0 0 / 20%);
+}
+
+.extrainput {
+  width: 450px;
+  height: 80px;
+  background-color: red;
+
+}
+
+
+
+/* .autocompletename {
+    border-bottom: 1px solid #e6e6e6;
+    padding: 8px 5px;
+    cursor: pointer;
+    font-size: 10px;
+    font-family: sans-serif;
+    color: dodgerblue;
+    font-family: bold;
+  } */
+
+.autocompletename {
+  border-bottom: 1px solid #e6e6e6;
+  /* padding: 10px; */
+  cursor: pointer;
+  font-size: 12px;
+  color: #333;
+  font-family: Helvetica Neue, Roboto, Helvetica, sans-serif;
+}
+
+.autocompletename:hover {
+  color: #fff;
+  background: #889096;
+}
+
+.activeItem {
+  color: #fff;
+  background: #889096;
+  padding: 10px;
+
+}
+
+.inactive {
+  color: #333;
+  padding: 10px;
+}
+
+.inactive:hover {
+  color: #fff;
+  background: #889096;
+}
+
+
 .autocomplete {
 
-    font-size: 10px;
-    position: absolute;
-    z-index: 99;
-    left: 0;
-    top: 20;
-    width: 100%;
-    max-height: 300px;
-    /* overflow-y: scroll; */
-    overflow-x: hidden;
-    border-radius: 5px;
-    /* position: absolute;
+  font-size: 10px;
+  position: absolute;
+  z-index: 99;
+  left: 0;
+  top: 20;
+  width: auto;
+  /* max-width: 250px; */
+  max-height: 210px;
+  /* overflow-y: scroll; */
+  /* overflow-x: hidden; */
+  border-radius: 5px;
+  /* position: absolute;
     border: 1px solid #d4d4d4;
     border-bottom: none;
     border-top: none;
     z-index: 99;
     /*position the autocomplete items to be the same width as the container:*/
-    /* top: 50%;
+  /* top: 50%;
     left: 0;
     right: 0; */
 }
 
-.autocompletename {
-    border-bottom: 1px solid #b6d2ec;
+.inputsecondary {
+  /* background-color:red; */
+  /* height:200px; */
+  -webkit-appearance: none;
+  background-color: #f7f8f9;
+  border: 1px solid #c8c9c7;
+  border-radius: 0.25rem;
+  color: #000;
+  display: block;
+  font-size: 1rem;
+  line-height: 1.375rem;
+  min-height: 3.125rem;
+  padding: 0 0.625rem;
+  transition: border-color .25s ease-out;
+  width: 100%;
+  margin-top: 5px;
+}
+
+.inputsecondary:focus {
+  outline: none;
+}
+
+/* .autocompletename {
+    border-bottom: 1px solid #e6e6e6;
     height: 50px;
     padding: 8px 5px;
-
-    width: 100%;
+    
+    width: auto;
     cursor: pointer;
     background-color: rgba(255, 255, 255, 0) !important;
     font-size: 12px;
-    font-family: inherit;
-    color: black;
+    font-family:inherit;
+    color:black;
     letter-spacing: 1px;
     word-spacing: 2px;
-    font-family: bold;
-}
+    font-family: sans-serif;
+  } */
+/* .autocompletename {
+    border-bottom: 1px solid #e6e6e6;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #333;
+    font-family: Helvetica Neue,Roboto,Helvetica,sans-serif;
+} */
 
 .autocompleteInput {
-    min-width: 220px;
-    margin: 20px;
-    background-color: rgba(0, 149, 255, 0.113);
+  min-width: 220px;
+  margin: 20px;
+  background-color: rgba(0, 149, 255, 0.113);
+}
+
+
+
+.activeItem {
+  color: #fff;
+  background: #889096;
+}
+
+
+
+.bgblue {
+  background: blue;
+}
+
+.bgred {
+  background: red;
+  width: 600px;
+}
+
+#localityid {
+  color: #282c34;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.autocomplete {
+  background: #fff;
+  font-size: 10px;
+  position: relative;
+  z-index: 99;
+  left: 0;
+  top: 0;
+  /* min-width: 236px; */
+  max-height: 300px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  box-shadow: 0px 4px 10px 1px rgb(0 0 0 / 20%);
+}
+
+.extrainput {
+  width: 450px;
+  height: 80px;
+  background-color: red;
+
+}
+
+
+
+/* .autocompletename {
+    border-bottom: 1px solid #e6e6e6;
+    padding: 8px 5px;
+    cursor: pointer;
+    font-size: 10px;
+    font-family: sans-serif;
+    color: dodgerblue;
+    font-family: bold;
+  } */
+
+.autocompletename {
+  border-bottom: 1px solid #e6e6e6;
+  /* padding: 10px; */
+  cursor: pointer;
+  font-size: 12px;
+  color: #333;
+  font-family: Helvetica Neue, Roboto, Helvetica, sans-serif;
+}
+
+.autocompletename:hover {
+  color: #fff;
+  background: #889096;
+}
+
+.activeItem {
+  color: #fff;
+  background: #889096;
+  padding: 10px;
+
+}
+
+.inactive {
+  color: #333;
+  padding: 10px;
+}
+
+.inactive:hover {
+  color: #fff;
+  background: #889096;
+}
+
+.inputAutocomplete {
+  width: 210px;
+  border: 1px solid #c8c9c7;
+  border-radius: 0.25rem;
+  color: #000;
+  display: block;
+  font-size: 1rem;
+  line-height: 1.375rem;
+  min-height: 3.125rem;
+  padding: 0 0.625rem;
+  transition: .25s ease-out;
+  margin-top: 5px;
+
+}
+
+.wrapper-outer {
+
+  height: auto;
+  width: 100%;
+  /* min-width: 241px; */
+  background: white;
+  max-height: 200px;
+  min-height: 0px;
+  overflow-y: scroll;
+  color: #333;
+  box-shadow: 0px 4px 10px 1px rgb(0 0 0 / 20%);
+
+}
+
+.wrapper-ul {
+  list-style: none;
+  margin: 0;
+  padding: 0px 0px;
+}
+
+.li-inner {
+
+  margin-bottom: 10;
+  font-size: 12;
+  cursor: pointer;
+  padding: 5px 10px;
+  margin-bottom: 2px solid black;
+
 }
