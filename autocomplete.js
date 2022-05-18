@@ -15,6 +15,9 @@ function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "functio
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function Addressinput(props) {
+  const outsideRef = (0, _react.useRef)(); //starts
+
+  const showHideRef = (0, _react.useRef)(null);
   const activeRef = (0, _react.useRef)();
   const testRef = (0, _react.useRef)();
   const clickRef = (0, _react.useRef)();
@@ -43,6 +46,21 @@ function Addressinput(props) {
       props.parentCallback(newAddresses);
     }
   }, [newAddresses]);
+  (0, _react.useEffect)(() => {
+    const checkIfClickedOutside = e => {
+      // If the menu is open and the clicked target is not within the menu,
+      // then close the menu
+      if (showHideList && showHideRef.current && !showHideRef.current.contains(e.target)) {
+        setShowHideList(false);
+      }
+    };
+
+    document.addEventListener("mousedown", checkIfClickedOutside);
+    return () => {
+      // Cleanup the event listener
+      document.removeEventListener("mousedown", checkIfClickedOutside);
+    };
+  }, [showHideList]);
   (0, _react.useEffect)(() => {
     const styles = getComputedStyle(focusRef.current);
     let totalsize = Number(styles.width.slice(0, -2)) + Number(styles.paddingRight.slice(0, -2)) + Number(styles.paddingLeft.slice(0, -2));
@@ -126,6 +144,8 @@ function Addressinput(props) {
     fullAddress.pop();
     fullAddress.pop();
     fullAddress.pop();
+    let booleanc = true;
+    let booleanc2 = true;
 
     for (let i = 0; i < fullAddress.length; i++) {
       if (line1.length + fullAddress[i].length < props.limit) {
@@ -158,8 +178,7 @@ function Addressinput(props) {
   };
 
   return /*#__PURE__*/_react.default.createElement("div", {
-    ref: clickRef,
-    onClick: handleClickInside
+    ref: showHideRef
   }, /*#__PURE__*/_react.default.createElement("label", {
     className: props.labelclass ? props.labelclass : "lable-txt"
   }, address), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("input", {
@@ -185,7 +204,7 @@ function Addressinput(props) {
     style: {
       width: width
     }
-  }, showHideList & !clickedOutside ? /*#__PURE__*/_react.default.createElement("div", {
+  }, showHideList ? /*#__PURE__*/_react.default.createElement("div", {
     className: "wrapper-outer"
   }, /*#__PURE__*/_react.default.createElement("ul", {
     style: {
@@ -215,6 +234,7 @@ function Addressinput(props) {
 ;
 
 function Companyname(props) {
+  const showHideRef = (0, _react.useRef)();
   const activeRef = (0, _react.useRef)();
   const testRef = (0, _react.useRef)();
   const clickRef = (0, _react.useRef)();
@@ -231,6 +251,21 @@ function Companyname(props) {
   const [width, setWidth] = (0, _react.useState)(null);
   const [placePredictions, setPlacePredictions] = (0, _react.useState)([]);
   const [checker, setChecker] = (0, _react.useState)('');
+  (0, _react.useEffect)(() => {
+    const checkIfClickedOutside = e => {
+      // If the menu is open and the clicked target is not within the menu,
+      // then close the menu
+      if (showHideList && showHideRef.current && !showHideRef.current.contains(e.target)) {
+        setShowHideList(false);
+      }
+    };
+
+    document.addEventListener("mousedown", checkIfClickedOutside);
+    return () => {
+      // Cleanup the event listener
+      document.removeEventListener("mousedown", checkIfClickedOutside);
+    };
+  }, [showHideList]);
 
   const getPlacePredictions = data => {
     if (data.input.length > 2) {
@@ -297,9 +332,7 @@ function Companyname(props) {
   };
 
   return /*#__PURE__*/_react.default.createElement("div", {
-    ref: clickRef,
-    onClick: handleClickInside,
-    onBlur: handleClickOutside
+    ref: showHideRef
   }, /*#__PURE__*/_react.default.createElement("label", {
     className: props.labelclass ? props.labelclass : "lable-txt"
   }, address), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("input", {
@@ -325,7 +358,7 @@ function Companyname(props) {
     style: {
       width: width
     }
-  }, showHideList & !clickedOutside ? /*#__PURE__*/_react.default.createElement("div", {
+  }, showHideList ? /*#__PURE__*/_react.default.createElement("div", {
     className: "wrapper-outer"
   }, /*#__PURE__*/_react.default.createElement("ul", {
     style: {
