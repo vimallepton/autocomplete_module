@@ -108,9 +108,15 @@ function Addressinput(props) {
 
   const handleKeyDown = e => {
     if (e.keyCode === 13) {
-      setValue(placePredictions[cursor].description);
-      getplace(placePredictions[cursor].place_id, props.apikey);
-      setShowHideList(false);
+      if (!value || value.length === 0) {
+        setShowHideList(false);
+      } else if (value && cursor == -1) {
+        setShowHideList(false);
+      } else {
+        setValue(placePredictions[cursor].description);
+        getplace(placePredictions[cursor].place_id, props.apikey);
+        setShowHideList(false);
+      }
     }
 
     if (e.keyCode === 9) {
@@ -209,10 +215,9 @@ function Addressinput(props) {
       setShowHideList(true);
       setCursor(-1);
     }
-  }), showHideList && placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("ul", {
-    className: props.list ? props.list : "wrapper-ul",
-    key: i
-  }, /*#__PURE__*/_react.default.createElement("li", {
+  }), /*#__PURE__*/_react.default.createElement("ul", {
+    className: props.list ? props.list : "wrapper-ul"
+  }, showHideList && placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("li", {
     className: cursor === i ? `${props.listElement} activeItem` : `${props.listElement} inactive`,
     key: i,
     ref: cursor == i ? testRef : inactiveTestRef,
@@ -301,9 +306,15 @@ function Companyname(props) {
   const handleKeyDown = e => {
     if (e.keyCode === 13) {
       // console.log("13", placePredictions[cursor].company_name)
-      setValue(placePredictions[cursor].company_name);
-      props.parentCallback(placePredictions[cursor].company_name);
-      setShowHideList(false);
+      if (!value || value.length === 0) {
+        setShowHideList(false);
+      } else if (value && cursor == -1) {
+        setShowHideList(false);
+      } else {
+        setValue(placePredictions[cursor].company_name);
+        props.parentCallback(placePredictions[cursor].company_name);
+        setShowHideList(false);
+      }
     }
 
     if (e.keyCode === 9) {
@@ -351,10 +362,12 @@ function Companyname(props) {
       setShowHideList(true);
       setCursor(-1);
     }
-  }), showHideList && placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("ul", {
-    className: props.list ? props.list : "wrapper-ul",
-    key: i
-  }, /*#__PURE__*/_react.default.createElement("li", {
+  }), /*#__PURE__*/_react.default.createElement("ul", {
+    style: {
+      width: width
+    },
+    className: props.list ? props.list : "wrapper-ul"
+  }, showHideList && placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("li", {
     className: cursor === i ? `${props.listElement} activeItem` : `${props.listElement} inactive`,
     key: i,
     ref: cursor == i ? testRef : inactiveTestRef,
