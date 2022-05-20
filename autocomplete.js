@@ -33,6 +33,7 @@ function Addressinput(props) {
   const [clickedOutside, setClickedOutside] = (0, _react.useState)(false);
   const [width, setWidth] = (0, _react.useState)(null);
   const [placePredictions, setPlacePredictions] = (0, _react.useState)([]);
+  const [dal, setDal] = (0, _react.useState)('');
 
   const getPlacePredictions = data => {
     fetch(`https://api.leptonsoftware.com:9962/lepton/getplacepredication?input=${data.input}`).then(res => res.json()).then(json => {
@@ -111,8 +112,12 @@ function Addressinput(props) {
     }
 
     if (e.keyCode === 9) {
-      setValue(placePredictions[cursor].description);
-      setShowHideList(false);
+      if (!value) {
+        setShowHideList(false);
+      } else {
+        setValue(placePredictions[cursor + 1].description);
+        setShowHideList(false);
+      }
     }
 
     if (e.keyCode === 27) {
@@ -144,15 +149,18 @@ function Addressinput(props) {
     fullAddress.pop();
     fullAddress.pop();
     fullAddress.pop();
-    let booleanc = true;
-    let booleanc2 = true;
+    let a = true;
+    let b = true;
 
     for (let i = 0; i < fullAddress.length; i++) {
-      if (line1.length + fullAddress[i].length < props.limit) {
+      if (line1.length + fullAddress[i].length < props.limit && a) {
         if (line1 === '') line1 = `${fullAddress[i]}`;else line1 = `${line1},${fullAddress[i]}`;
-      } else if (line2.length + fullAddress[i].length < props.limit) {
+      } else if (line2.length + fullAddress[i].length < props.limit && b) {
+        a = false;
         if (line2 === '') line2 = `${fullAddress[i]}`;else line2 = `${line2},${fullAddress[i]}`;
-      } else if (line3.length + fullAddress[i].length < props.limit) {
+      } else if (line3.length + fullAddress[i].length) {
+        a = false;
+        b = false;
         if (line3 === '') line3 = `${fullAddress[i]}`;else line3 = `${line3},${fullAddress[i]}`;
       }
     }
@@ -241,7 +249,7 @@ function Companyname(props) {
   const focusRef = (0, _react.useRef)();
   const inputTag = (0, _react.useRef)();
   const inactiveTestRef = (0, _react.useRef)();
-  const [value, setValue] = (0, _react.useState)([]);
+  const [value, setValue] = (0, _react.useState)('');
   const [showHideList, setShowHideList] = (0, _react.useState)(true);
   const [address, setAddress] = (0, _react.useState)("");
   const [a, setA] = (0, _react.useState)("");
@@ -312,9 +320,14 @@ function Companyname(props) {
     }
 
     if (e.keyCode === 9) {
-      setValue(placePredictions[cursor].company_name);
-      props.parentCallback(placePredictions[cursor].company_name);
-      setShowHideList(false);
+      if (!value) {
+        setShowHideList(false);
+      } else if (value.length === 0) {
+        setShowHideList(false);
+      } else {
+        setValue(placePredictions[cursor + 1].company_name);
+        setShowHideList(false);
+      }
     }
 
     if (e.keyCode === 27) {
