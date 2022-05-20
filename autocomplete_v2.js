@@ -14,7 +14,11 @@ function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "functio
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
+// import ClickAwayListener from '@mui/material/ClickAwayListener';
 function Addressinput(props) {
+  const outsideRef = (0, _react.useRef)(); //starts
+
+  const showHideRef = (0, _react.useRef)(null);
   const activeRef = (0, _react.useRef)();
   const testRef = (0, _react.useRef)();
   const clickRef = (0, _react.useRef)();
@@ -30,7 +34,6 @@ function Addressinput(props) {
   const [clickedOutside, setClickedOutside] = (0, _react.useState)(false);
   const [width, setWidth] = (0, _react.useState)(null);
   const [placePredictions, setPlacePredictions] = (0, _react.useState)([]);
-  const [checker, setChecker] = (0, _react.useState)('');
 
   const getPlacePredictions = data => {
     fetch(`https://api.leptonsoftware.com:9962/lepton/getplacepredication?input=${data.input}`).then(res => res.json()).then(json => {
@@ -44,6 +47,23 @@ function Addressinput(props) {
       props.parentCallback(newAddresses);
     }
   }, [newAddresses]);
+  (0, _react.useEffect)(() => {
+    const checkIfClickedOutside = e => {
+      if (showHideList && showHideRef.current && !showHideRef.current.contains(e.target)) {
+        setShowHideList(false);
+      }
+    };
+
+    document.addEventListener("mousedown", checkIfClickedOutside);
+    return () => {
+      document.removeEventListener("mousedown", checkIfClickedOutside);
+    };
+  }, [showHideList]);
+  (0, _react.useEffect)(() => {
+    if (value.length <= 2) {
+      setShowHideList(false);
+    }
+  }, [value]);
   (0, _react.useEffect)(() => {
     const styles = getComputedStyle(focusRef.current);
     let totalsize = Number(styles.width.slice(0, -2)) + Number(styles.paddingRight.slice(0, -2)) + Number(styles.paddingLeft.slice(0, -2));
@@ -94,8 +114,13 @@ function Addressinput(props) {
     }
 
     if (e.keyCode === 9) {
-      setValue(placePredictions[cursor].description);
-      setShowHideList(false);
+      if (!value || value.length === 0) {
+        setShowHideList(false);
+      } else {
+        setValue(placePredictions[cursor + 1].description);
+        getplace(placePredictions[cursor + 1].place_id, props.apikey);
+        setShowHideList(false);
+      }
     }
 
     if (e.keyCode === 27) {
@@ -127,13 +152,18 @@ function Addressinput(props) {
     fullAddress.pop();
     fullAddress.pop();
     fullAddress.pop();
+    let a = true;
+    let b = true;
 
     for (let i = 0; i < fullAddress.length; i++) {
-      if (line1.length + fullAddress[i].length < props.limit) {
+      if (line1.length + fullAddress[i].length < props.limit && a) {
         if (line1 === '') line1 = `${fullAddress[i]}`;else line1 = `${line1},${fullAddress[i]}`;
-      } else if (line2.length + fullAddress[i].length < props.limit) {
+      } else if (line2.length + fullAddress[i].length < props.limit && b) {
+        a = false;
         if (line2 === '') line2 = `${fullAddress[i]}`;else line2 = `${line2},${fullAddress[i]}`;
-      } else if (line3.length + fullAddress[i].length < props.limit) {
+      } else if (line3.length + fullAddress[i].length) {
+        a = false;
+        b = false;
         if (line3 === '') line3 = `${fullAddress[i]}`;else line3 = `${line3},${fullAddress[i]}`;
       }
     }
@@ -159,18 +189,13 @@ function Addressinput(props) {
   };
 
   return /*#__PURE__*/_react.default.createElement("div", {
-    ref: clickRef,
-    onClick: handleClickInside
+    ref: showHideRef
   }, /*#__PURE__*/_react.default.createElement("label", {
-    className: props.labelclass ? props.labelclass : "lable-txt"
+    className: props.labelClass ? props.labelClass : "lable-txt"
   }, address), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("input", {
     ref: focusRef,
     id: "address",
-    style: {
-      width: '352px',
-      backgroundColor: '#f7f8f9'
-    },
-    className: props.class ? props.class : "inputAutocomplete",
+    className: props.inputBoxClass ? props.inputBoxClass : "inputAutocomplete",
     value: value,
     placeholder: props.placeholder ? props.placeholder : "",
     onKeyDown: e => handleKeyDown(e),
@@ -182,40 +207,25 @@ function Addressinput(props) {
       setShowHideList(true);
       setCursor(-1);
     }
-  }), /*#__PURE__*/_react.default.createElement("div", {
-    style: {
-      width: width
-    }
-  }, showHideList & !clickedOutside ? /*#__PURE__*/_react.default.createElement("div", {
-    className: "wrapper-outer"
-  }, /*#__PURE__*/_react.default.createElement("ul", {
-    style: {
-      listStyle: 'none',
-      padding: 0
-    },
-    className: "wrapper-ul"
-  }, placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("div", {
-    key: i,
-    className: cursor === i ? 'activeItem' : "inactive",
-    ref: cursor == i ? testRef : inactiveTestRef
+  }), showHideList && placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("ul", {
+    className: props.list ? props.list : "wrapper-ul",
+    key: i
   }, /*#__PURE__*/_react.default.createElement("li", {
-    className: "li-inner",
+    className: cursor === i ? `${props.listElement} activeItem` : `${props.listElement} inactive`,
     key: i,
-    style: {
-      maxWidth: '100%',
-      width: '100%'
-    },
+    ref: cursor == i ? testRef : inactiveTestRef,
     onClick: e => {
       setValue(item.description);
       getplace(item.place_id, props.apikey);
       setShowHideList(false);
     }
-  }, item.description))))) : null));
+  }, item.description))));
 }
 
 ;
 
 function Companyname(props) {
+  const showHideRef = (0, _react.useRef)();
   const activeRef = (0, _react.useRef)();
   const testRef = (0, _react.useRef)();
   const clickRef = (0, _react.useRef)();
@@ -232,13 +242,28 @@ function Companyname(props) {
   const [width, setWidth] = (0, _react.useState)(null);
   const [placePredictions, setPlacePredictions] = (0, _react.useState)([]);
   const [checker, setChecker] = (0, _react.useState)('');
+  (0, _react.useEffect)(() => {
+    const checkIfClickedOutside = e => {
+      if (showHideList && showHideRef.current && !showHideRef.current.contains(e.target)) {
+        setShowHideList(false);
+      }
+    };
 
-  const getPlacePredictions = evt => {
-    const value = evt.target.value;
+    document.addEventListener("mousedown", checkIfClickedOutside);
+    return () => {
+      document.removeEventListener("mousedown", checkIfClickedOutside);
+    };
+  }, [showHideList]);
+  (0, _react.useEffect)(() => {
+    if (value.length <= 2) {
+      setShowHideList(false);
+    }
+  }, [value]);
 
-    if (value > 2) {
-      fetch(`https://api.leptonsoftware.com:9962/lepton/companyname?name=${value}`).then(res => res.json()).then(json => {
-        if (evt.target.value == json.data.input) setPlacePredictions(json.data.name);
+  const getPlacePredictions = data => {
+    if (data.input.length > 2) {
+      fetch(`https://api.leptonsoftware.com:9962/lepton/companyname?name=${data.input}`).then(res => res.json()).then(json => {
+        setPlacePredictions(json.data.name);
       });
     }
   };
@@ -273,16 +298,20 @@ function Companyname(props) {
 
   const handleKeyDown = e => {
     if (e.keyCode === 13) {
-      console.log("13", placePredictions[cursor].company_name);
+      // console.log("13", placePredictions[cursor].company_name)
       setValue(placePredictions[cursor].company_name);
       props.parentCallback(placePredictions[cursor].company_name);
       setShowHideList(false);
     }
 
     if (e.keyCode === 9) {
-      setValue(placePredictions[cursor].company_name);
-      props.parentCallback(placePredictions[cursor].company_name);
-      setShowHideList(false);
+      if (!value || value.length === 0) {
+        setShowHideList(false);
+      } else {
+        setValue(placePredictions[cursor + 1].company_name);
+        props.parentCallback(placePredictions[cursor + 1].company_name);
+        setShowHideList(false);
+      }
     }
 
     if (e.keyCode === 27) {
@@ -290,8 +319,7 @@ function Companyname(props) {
     }
 
     if (e.keyCode === 38 && cursor > 0) {
-      setCursor(cursor - 1);
-      console.log("38", placePredictions[cursor].company_name);
+      setCursor(cursor - 1); // console.log("38", placePredictions[cursor].company_name)
 
       if (e.keyCode === 13) {}
     } else if (e.keyCode === 40 && cursor < placePredictions.length - 1) {
@@ -300,57 +328,38 @@ function Companyname(props) {
   };
 
   return /*#__PURE__*/_react.default.createElement("div", {
-    ref: clickRef,
-    onClick: handleClickInside,
-    onBlur: handleClickOutside
+    ref: showHideRef
   }, /*#__PURE__*/_react.default.createElement("label", {
-    className: props.labelclass ? props.labelclass : "lable-txt"
+    className: props.labelClass ? props.labelClass : "lable-txt"
   }, address), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("input", {
+    // onFocus={() => { console.log("focused") }}
     ref: focusRef,
     id: "address",
-    style: {
-      width: '352px',
-      backgroundColor: '#f7f8f9'
-    },
-    className: props.class ? props.class : "inputAutocomplete",
+    className: props.inputBoxClass ? props.inputBoxClass : "inputAutocomplete",
     value: value,
     placeholder: props.placeholder ? props.placeholder : "",
     onKeyDown: e => handleKeyDown(e),
     onChange: evt => {
-      getPlacePredictions(evt);
+      getPlacePredictions({
+        input: evt.target.value
+      });
       setValue(evt.target.value);
-      setChecker(evt.target.value);
       setShowHideList(true);
       setCursor(-1);
     }
-  }), /*#__PURE__*/_react.default.createElement("div", {
-    style: {
-      width: width
-    }
-  }, showHideList & !clickedOutside ? /*#__PURE__*/_react.default.createElement("div", {
-    className: "wrapper-outer"
-  }, /*#__PURE__*/_react.default.createElement("ul", {
-    style: {
-      listStyle: 'none',
-      padding: 0
-    },
-    className: "wrapper-ul"
-  }, placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("div", {
-    key: i,
-    className: cursor === i ? 'activeItem' : "inactive",
-    ref: cursor == i ? testRef : inactiveTestRef
+  }), showHideList && placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("ul", {
+    className: props.list ? props.list : "wrapper-ul",
+    key: i
   }, /*#__PURE__*/_react.default.createElement("li", {
-    className: "li-inner",
+    className: cursor === i ? `${props.listElement} activeItem` : `${props.listElement} inactive`,
     key: i,
-    style: {
-      maxWidth: '100%'
-    },
+    ref: cursor == i ? testRef : inactiveTestRef,
     onClick: e => {
       setValue(item.company_name);
       props.parentCallback(item.company_name);
       setShowHideList(false);
     }
-  }, item.company_name))))) : null));
+  }, item.company_name))));
 }
 
 ;
