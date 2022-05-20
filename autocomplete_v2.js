@@ -114,7 +114,7 @@ function Addressinput(props) {
         setShowHideList(false);
       } else {
         setValue(placePredictions[cursor].description);
-        getplace(placePredictions[cursor].place_id, props.apikey);
+        getplace(placePredictions[cursor].place_id);
         setShowHideList(false);
       }
     }
