@@ -107,15 +107,18 @@ function Addressinput(props) {
   const handleKeyDown = e => {
     if (e.keyCode === 13) {
       setValue(placePredictions[cursor].description);
-      getplace(placePredictions[cursor].place_id, props.apikey);
+      getplace(placePredictions[cursor].place_id);
       setShowHideList(false);
     }
 
     if (e.keyCode === 9) {
       if (!value) {
         setShowHideList(false);
+      } else if (value && cursor == -1) {
+        setShowHideList(false);
       } else {
-        setValue(placePredictions[cursor + 1].description);
+        setValue(placePredictions[cursor].description);
+        getplace(placePredictions[cursor].place_id);
         setShowHideList(false);
       }
     }
@@ -320,12 +323,14 @@ function Companyname(props) {
     }
 
     if (e.keyCode === 9) {
-      if (!value) {
+      if (!value && cursor == -1) {
         setShowHideList(false);
       } else if (value.length === 0) {
         setShowHideList(false);
+      } else if (value && cursor == -1) {
+        setShowHideList(false);
       } else {
-        setValue(placePredictions[cursor + 1].company_name);
+        setValue(placePredictions[cursor].company_name);
         setShowHideList(false);
       }
     }
