@@ -106,9 +106,15 @@ function Addressinput(props) {
 
   const handleKeyDown = e => {
     if (e.keyCode === 13) {
-      setValue(placePredictions[cursor].description);
-      getplace(placePredictions[cursor].place_id);
-      setShowHideList(false);
+      if (!value || value.length === 0) {
+        setShowHideList(false);
+      } else if (value && cursor == -1) {
+        setShowHideList(false);
+      } else {
+        setValue(placePredictions[cursor].description);
+        getplace(placePredictions[cursor].place_id, props.apikey);
+        setShowHideList(false);
+      }
     }
 
     if (e.keyCode === 9) {
@@ -316,10 +322,15 @@ function Companyname(props) {
 
   const handleKeyDown = e => {
     if (e.keyCode === 13) {
-      console.log("13", placePredictions[cursor].company_name);
-      setValue(placePredictions[cursor].company_name);
-      props.parentCallback(placePredictions[cursor].company_name);
-      setShowHideList(false);
+      if (!value || value.length === 0) {
+        setShowHideList(false);
+      } else if (value && cursor == -1) {
+        setShowHideList(false);
+      } else {
+        setValue(placePredictions[cursor].company_name);
+        props.parentCallback(placePredictions[cursor].company_name);
+        setShowHideList(false);
+      }
     }
 
     if (e.keyCode === 9) {
@@ -343,7 +354,9 @@ function Companyname(props) {
       setCursor(cursor - 1);
       console.log("38", placePredictions[cursor].company_name);
 
-      if (e.keyCode === 13) {}
+      if (e.keyCode === 13) {
+        console.log("sss");
+      }
     } else if (e.keyCode === 40 && cursor < placePredictions.length - 1) {
       setCursor(cursor + 1);
     }
