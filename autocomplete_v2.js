@@ -16,8 +16,7 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 
 // import ClickAwayListener from '@mui/material/ClickAwayListener';
 function Addressinput(props) {
-  const outsideRef = (0, _react.useRef)(); //starts
-
+  const outsideRef = (0, _react.useRef)();
   const showHideRef = (0, _react.useRef)(null);
   const activeRef = (0, _react.useRef)();
   const testRef = (0, _react.useRef)();
@@ -31,9 +30,9 @@ function Addressinput(props) {
   const [a, setA] = (0, _react.useState)("");
   const [newAddresses, setNewAddresses] = (0, _react.useState)();
   const [cursor, setCursor] = (0, _react.useState)(-1);
-  const [clickedOutside, setClickedOutside] = (0, _react.useState)(false);
   const [width, setWidth] = (0, _react.useState)(null);
   const [placePredictions, setPlacePredictions] = (0, _react.useState)([]);
+  const [clickInput, setClickInput] = (0, _react.useState)(false);
 
   const getPlacePredictions = data => {
     fetch(`https://api.leptonsoftware.com:9962/lepton/getplacepredication?input=${data.input}`).then(res => res.json()).then(json => {
@@ -43,7 +42,6 @@ function Addressinput(props) {
 
   (0, _react.useEffect)(() => {
     if (newAddresses != null) {
-      console.log("viiii", newAddresses);
       props.parentCallback(newAddresses);
     }
   }, [newAddresses]);
@@ -51,6 +49,7 @@ function Addressinput(props) {
     const checkIfClickedOutside = e => {
       if (showHideList && showHideRef.current && !showHideRef.current.contains(e.target)) {
         setShowHideList(false);
+        setClickInput(false);
       }
     };
 
@@ -59,11 +58,6 @@ function Addressinput(props) {
       document.removeEventListener("mousedown", checkIfClickedOutside);
     };
   }, [showHideList]);
-  (0, _react.useEffect)(() => {
-    if (value.length <= 2) {
-      setShowHideList(false);
-    }
-  }, [value]);
   (0, _react.useEffect)(() => {
     const styles = getComputedStyle(focusRef.current);
     let totalsize = Number(styles.width.slice(0, -2)) + Number(styles.paddingRight.slice(0, -2)) + Number(styles.paddingLeft.slice(0, -2));
@@ -75,7 +69,7 @@ function Addressinput(props) {
   };
 
   (0, _react.useEffect)(() => {
-    if (props.searchval != '') {
+    if (props.searchval != '' && clickInput === true) {
       setValue(props.searchval);
       getPlacePredictions({
         input: props.searchval
@@ -84,7 +78,7 @@ function Addressinput(props) {
       setA(props.searchval);
       focusRef.current.focus();
     }
-  }, [props.searchval]);
+  }, [props.searchval, clickInput]);
   (0, _react.useEffect)(() => {
     setAddress(props.label || 'Company address');
   }, [props.label]);
@@ -93,18 +87,6 @@ function Addressinput(props) {
       testRef.current.scrollIntoViewIfNeeded();
     }
   }, [cursor]);
-
-  const handleClickOutside = e => {
-    if (!clickRef.current.contains(e.target)) {
-      setClickedOutside(true);
-    }
-  };
-
-  const handleClickInside = e => {
-    if (!clickRef.current.contains(e.target)) {
-      setClickedOutside(true);
-    }
-  };
 
   const handleKeyDown = e => {
     if (e.keyCode === 13) {
@@ -201,6 +183,9 @@ function Addressinput(props) {
   }, /*#__PURE__*/_react.default.createElement("label", {
     className: props.labelClass ? props.labelClass : "lable-txt"
   }, address), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("input", {
+    onClick: () => {
+      setClickInput(true);
+    },
     ref: focusRef,
     id: "address",
     className: props.inputBoxClass ? props.inputBoxClass : "inputAutocomplete",
@@ -305,7 +290,6 @@ function Companyname(props) {
 
   const handleKeyDown = e => {
     if (e.keyCode === 13) {
-      // console.log("13", placePredictions[cursor].company_name)
       if (!value || value.length === 0) {
         setShowHideList(false);
       } else if (value && cursor == -1) {
@@ -349,7 +333,7 @@ function Companyname(props) {
   }, address), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("input", {
     // onFocus={() => { console.log("focused") }}
     ref: focusRef,
-    id: "address",
+    id: "companyname",
     className: props.inputBoxClass ? props.inputBoxClass : "inputAutocomplete",
     value: value,
     placeholder: props.placeholder ? props.placeholder : "",
