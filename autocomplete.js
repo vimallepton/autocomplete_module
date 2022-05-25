@@ -34,6 +34,7 @@ function Addressinput(props) {
   const [width, setWidth] = (0, _react.useState)(null);
   const [placePredictions, setPlacePredictions] = (0, _react.useState)([]);
   const [dal, setDal] = (0, _react.useState)('');
+  const [clickInput, setClickInput] = (0, _react.useState)(false);
 
   const getPlacePredictions = data => {
     fetch(`https://api.leptonsoftware.com:9962/lepton/getplacepredication?input=${data.input}`).then(res => res.json()).then(json => {
@@ -49,10 +50,9 @@ function Addressinput(props) {
   }, [newAddresses]);
   (0, _react.useEffect)(() => {
     const checkIfClickedOutside = e => {
-      // If the menu is open and the clicked target is not within the menu,
-      // then close the menu
       if (showHideList && showHideRef.current && !showHideRef.current.contains(e.target)) {
         setShowHideList(false);
+        setClickInput(false);
       }
     };
 
@@ -73,7 +73,7 @@ function Addressinput(props) {
   };
 
   (0, _react.useEffect)(() => {
-    if (props.searchval != '') {
+    if (props.searchval != '' && clickInput === true) {
       setValue(props.searchval);
       getPlacePredictions({
         input: props.searchval
@@ -82,7 +82,7 @@ function Addressinput(props) {
       setA(props.searchval);
       focusRef.current.focus();
     }
-  }, [props.searchval]);
+  }, [props.searchval, clickInput]);
   (0, _react.useEffect)(() => {
     setAddress(props.label || 'Company address');
   }, [props.label]);
@@ -199,6 +199,9 @@ function Addressinput(props) {
   }, /*#__PURE__*/_react.default.createElement("label", {
     className: props.labelclass ? props.labelclass : "lable-txt"
   }, address), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("input", {
+    onClick: () => {
+      setClickInput(true);
+    },
     ref: focusRef,
     id: "address",
     style: {
@@ -294,7 +297,6 @@ function Companyname(props) {
 
   (0, _react.useEffect)(() => {
     if (newAddresses != null) {
-      console.log("viiii", newAddresses);
       props.parentCallback(newAddresses);
     }
   }, [newAddresses]);
@@ -352,11 +354,8 @@ function Companyname(props) {
 
     if (e.keyCode === 38 && cursor > 0) {
       setCursor(cursor - 1);
-      console.log("38", placePredictions[cursor].company_name);
 
-      if (e.keyCode === 13) {
-        console.log("sss");
-      }
+      if (e.keyCode === 13) {}
     } else if (e.keyCode === 40 && cursor < placePredictions.length - 1) {
       setCursor(cursor + 1);
     }
@@ -368,7 +367,7 @@ function Companyname(props) {
     className: props.labelclass ? props.labelclass : "lable-txt"
   }, address), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("input", {
     ref: focusRef,
-    id: "address",
+    id: "companyname",
     style: {
       width: '352px',
       backgroundColor: '#f7f8f9'
