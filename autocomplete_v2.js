@@ -94,6 +94,7 @@ function Addressinput(props) {
         if (placePredictions.length > 0 && cursor !== -1) {
           setValue(placePredictions[cursor].description);
           getplace(placePredictions[cursor].place_id);
+          setCursor(-1);
         }
 
         setShowHideList(false);
@@ -107,12 +108,14 @@ function Addressinput(props) {
         if (placePredictions.length > 0 && cursor !== -1) {
           setValue(placePredictions[cursor].description);
           getplace(placePredictions[cursor].place_id);
+          setCursor(-1);
         }
       } else if (value && cursor == -1) {
         setShowHideList(false);
       } else {
         setValue(placePredictions[cursor].description);
         getplace(placePredictions[cursor].place_id);
+        setCursor(-1);
         setShowHideList(false);
       }
     }
