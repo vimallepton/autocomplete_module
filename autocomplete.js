@@ -18,11 +18,9 @@ function Addressinput(props) {
   const outsideRef = (0, _react.useRef)(); //starts
 
   const showHideRef = (0, _react.useRef)(null);
-  const activeRef = (0, _react.useRef)();
   const testRef = (0, _react.useRef)();
   const clickRef = (0, _react.useRef)();
   const focusRef = (0, _react.useRef)();
-  const inputTag = (0, _react.useRef)();
   const inactiveTestRef = (0, _react.useRef)();
   const [value, setValue] = (0, _react.useState)("");
   const [showHideList, setShowHideList] = (0, _react.useState)(true);
@@ -33,7 +31,6 @@ function Addressinput(props) {
   const [clickedOutside, setClickedOutside] = (0, _react.useState)(false);
   const [width, setWidth] = (0, _react.useState)(null);
   const [placePredictions, setPlacePredictions] = (0, _react.useState)([]);
-  const [dal, setDal] = (0, _react.useState)('');
   const [clickInput, setClickInput] = (0, _react.useState)(false);
 
   const getPlacePredictions = data => {
@@ -44,7 +41,6 @@ function Addressinput(props) {
 
   (0, _react.useEffect)(() => {
     if (newAddresses != null) {
-      console.log("viiii", newAddresses);
       props.parentCallback(newAddresses);
     }
   }, [newAddresses]);
@@ -61,7 +57,8 @@ function Addressinput(props) {
       // Cleanup the event listener
       document.removeEventListener("mousedown", checkIfClickedOutside);
     };
-  }, [showHideList]);
+  }, [showHideList]); //// CHANGE STARTS here
+
   (0, _react.useEffect)(() => {
     const styles = getComputedStyle(focusRef.current);
     let totalsize = Number(styles.width.slice(0, -2)) + Number(styles.paddingRight.slice(0, -2)) + Number(styles.paddingLeft.slice(0, -2));
@@ -74,15 +71,19 @@ function Addressinput(props) {
 
   (0, _react.useEffect)(() => {
     if (props.searchval != '' && clickInput === true) {
-      setValue(props.searchval);
+      //setValue(props.searchval);
       getPlacePredictions({
         input: props.searchval
       });
       setShowHideList(true);
       setA(props.searchval);
-      focusRef.current.focus();
+      setValue("");
+      setCursor(-1);
     }
   }, [props.searchval, clickInput]);
+  (0, _react.useEffect)(() => {
+    setValue("");
+  }, [props.companyNameInputTrack]);
   (0, _react.useEffect)(() => {
     setAddress(props.label || 'Company address');
   }, [props.label]);
@@ -92,34 +93,30 @@ function Addressinput(props) {
     }
   }, [cursor]);
 
-  const handleClickOutside = e => {
-    if (!clickRef.current.contains(e.target)) {
-      setClickedOutside(true);
-    }
-  };
-
-  const handleClickInside = e => {
-    if (!clickRef.current.contains(e.target)) {
-      setClickedOutside(true);
-    }
-  };
-
   const handleKeyDown = e => {
     if (e.keyCode === 13) {
-      if (!value || value.length === 0) {
-        setShowHideList(false);
-      } else if (value && cursor == -1) {
+      if (value && cursor == -1) {
         setShowHideList(false);
       } else {
-        setValue(placePredictions[cursor].description);
-        getplace(placePredictions[cursor].place_id, props.apikey);
+        if (placePredictions.length > 0 && cursor !== -1) {
+          setValue(placePredictions[cursor].description);
+          getplace(placePredictions[cursor].place_id);
+          setCursor(-1);
+        }
+
         setShowHideList(false);
       }
     }
 
     if (e.keyCode === 9) {
-      if (!value) {
+      if (!value || value.length === 0) {
         setShowHideList(false);
+
+        if (placePredictions.length > 0 && cursor !== -1) {
+          setValue(placePredictions[cursor].description);
+          getplace(placePredictions[cursor].place_id);
+          setCursor(-1);
+        }
       } else if (value && cursor == -1) {
         setShowHideList(false);
       } else {
@@ -134,9 +131,7 @@ function Addressinput(props) {
     }
 
     if (e.keyCode === 38 && cursor > 0) {
-      if (e.keyCode === 13) {}
-
-      setCursor(cursor - 1, () => {});
+      setCursor(cursor - 1);
     } else if (e.keyCode === 40 && cursor < placePredictions.length - 1) {
       setCursor(cursor + 1);
     }
@@ -154,10 +149,8 @@ function Addressinput(props) {
     let line1 = '';
     let line2 = '';
     let line3 = '';
-    const fullAddress = formattedAddress.split(',');
-    fullAddress.pop();
-    fullAddress.pop();
-    fullAddress.pop();
+    let fullAddress = formattedAddress.split(',');
+    fullAddress = fullAddress.slice(0, fullAddress.length - 3);
     let a = true;
     let b = true;
 
@@ -182,6 +175,7 @@ function Addressinput(props) {
     addressParts.state = state ? state.long_name : '';
     addressParts.pincode = pincode ? pincode.long_name : '';
     addressParts.country = country ? country.long_name : '';
+    setValue(line1);
     return addressParts;
   };
 
@@ -200,13 +194,20 @@ function Addressinput(props) {
     className: props.labelclass ? props.labelclass : "lable-txt"
   }, address), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("input", {
     onClick: () => {
+      props.setShowDropdownSetter(true);
       setClickInput(true);
     },
+    onFocus: () => {
+      props.setShowDropdownSetter(true);
+      setClickInput(true);
+    } // onClick={()=>{setClickInput(true)}}
+    ,
     ref: focusRef,
     id: "address",
     style: {
       width: '352px',
-      backgroundColor: '#f7f8f9'
+      backgroundColor: '#f7f8f9',
+      maxHeight: props.maxheight ? props.maxheight : 'auto'
     },
     className: props.class ? props.class : "inputAutocomplete",
     value: value,
@@ -232,7 +233,7 @@ function Addressinput(props) {
       padding: 0
     },
     className: "wrapper-ul"
-  }, placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("div", {
+  }, showHideList && props.showDropdown && placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("div", {
     key: i,
     className: cursor === i ? 'activeItem' : "inactive",
     ref: cursor == i ? testRef : inactiveTestRef
@@ -255,22 +256,19 @@ function Addressinput(props) {
 
 function Companyname(props) {
   const showHideRef = (0, _react.useRef)();
-  const activeRef = (0, _react.useRef)();
   const testRef = (0, _react.useRef)();
   const clickRef = (0, _react.useRef)();
   const focusRef = (0, _react.useRef)();
-  const inputTag = (0, _react.useRef)();
   const inactiveTestRef = (0, _react.useRef)();
   const [value, setValue] = (0, _react.useState)('');
   const [showHideList, setShowHideList] = (0, _react.useState)(true);
-  const [address, setAddress] = (0, _react.useState)("");
-  const [a, setA] = (0, _react.useState)("");
-  const [newAddresses, setNewAddresses] = (0, _react.useState)();
-  const [cursor, setCursor] = (0, _react.useState)(-1);
-  const [clickedOutside, setClickedOutside] = (0, _react.useState)(false);
-  const [width, setWidth] = (0, _react.useState)(null);
+  const [address, setAddress] = (0, _react.useState)(""); // const [newAddresses, setNewAddresses] = useState(); 
+
+  const [cursor, setCursor] = (0, _react.useState)(-1); // const [clickedOutside, setClickedOutside] = useState(false); 
+
+  const [width, setWidth] = (0, _react.useState)(null); //This will be used 
+
   const [placePredictions, setPlacePredictions] = (0, _react.useState)([]);
-  const [checker, setChecker] = (0, _react.useState)('');
   (0, _react.useEffect)(() => {
     const checkIfClickedOutside = e => {
       // If the menu is open and the clicked target is not within the menu,
@@ -293,16 +291,12 @@ function Companyname(props) {
         setPlacePredictions(json.data.name);
       });
     }
-  };
+  }; // useEffect(() => { if (newAddresses != null) {  props.parentCallback(newAddresses); } }, [newAddresses]);
+
 
   (0, _react.useEffect)(() => {
-    if (newAddresses != null) {
-      props.parentCallback(newAddresses);
-    }
-  }, [newAddresses]);
-  (0, _react.useEffect)(() => {
     setAddress(props.label || 'Company Name');
-  }, props.label);
+  }, [props.label]);
   (0, _react.useEffect)(() => {
     if (testRef.current) {
       testRef.current.scrollIntoViewIfNeeded();
@@ -310,17 +304,8 @@ function Companyname(props) {
   }, [cursor]);
   (0, _react.useEffect)(() => {
     if (value.length < 1) setPlacePredictions('');
-  }, [value]);
-
-  const handleClickOutside = e => {
-    if (!clickRef.current.contains(e.target)) {
-      setClickedOutside(true);
-    }
-  };
-
-  const handleClickInside = e => {
-    setClickedOutside(false);
-  };
+  }, [value]); // const handleClickOutside = e => { if (!clickRef.current.contains(e.target)) { setClickedOutside(true); } };
+  // const handleClickInside = (e) => { setClickedOutside(false); };
 
   const handleKeyDown = e => {
     if (e.keyCode === 13) {
@@ -344,6 +329,7 @@ function Companyname(props) {
         setShowHideList(false);
       } else {
         setValue(placePredictions[cursor].company_name);
+        props.parentCallback(placePredictions[cursor].company_name);
         setShowHideList(false);
       }
     }
@@ -369,6 +355,7 @@ function Companyname(props) {
     ref: focusRef,
     id: "companyname",
     style: {
+      maxHeight: props.maxheight ? props.maxheight : 'auto',
       width: '352px',
       backgroundColor: '#f7f8f9'
     },
@@ -382,7 +369,9 @@ function Companyname(props) {
       });
       setValue(evt.target.value);
       setShowHideList(true);
+      props.companyNameInputSetter(evt.target.value);
       setCursor(-1);
+      props.setShowDropdownSetter(false);
     }
   }), /*#__PURE__*/_react.default.createElement("div", {
     style: {
