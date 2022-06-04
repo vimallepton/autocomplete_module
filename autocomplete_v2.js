@@ -14,15 +14,10 @@ function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "functio
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-// import ClickAwayListener from '@mui/material/ClickAwayListener';
 function Addressinput(props) {
-  const outsideRef = (0, _react.useRef)();
   const showHideRef = (0, _react.useRef)(null);
-  const activeRef = (0, _react.useRef)();
   const testRef = (0, _react.useRef)();
-  const clickRef = (0, _react.useRef)();
   const focusRef = (0, _react.useRef)();
-  const inputTag = (0, _react.useRef)();
   const inactiveTestRef = (0, _react.useRef)();
   const [value, setValue] = (0, _react.useState)("");
   const [showHideList, setShowHideList] = (0, _react.useState)(true);
@@ -32,7 +27,7 @@ function Addressinput(props) {
   const [cursor, setCursor] = (0, _react.useState)(-1);
   const [width, setWidth] = (0, _react.useState)(null);
   const [placePredictions, setPlacePredictions] = (0, _react.useState)([]);
-  const [clickInput, setClickInput] = (0, _react.useState)(false);
+  const [clickInput, setClickInput] = (0, _react.useState)(false); // To get place prediction value 
 
   const getPlacePredictions = data => {
     fetch(`https://api.leptonsoftware.com:9962/lepton/getplacepredication?input=${data.input}`).then(res => res.json()).then(json => {
@@ -70,15 +65,18 @@ function Addressinput(props) {
 
   (0, _react.useEffect)(() => {
     if (props.searchval != '' && clickInput === true) {
-      setValue(props.searchval);
       getPlacePredictions({
         input: props.searchval
       });
       setShowHideList(true);
       setA(props.searchval);
-      focusRef.current.focus();
+      setValue("");
+      setCursor(-1);
     }
   }, [props.searchval, clickInput]);
+  (0, _react.useEffect)(() => {
+    setValue("");
+  }, [props.companyNameInputTrack]);
   (0, _react.useEffect)(() => {
     setAddress(props.label || 'Company address');
   }, [props.label]);
@@ -90,13 +88,14 @@ function Addressinput(props) {
 
   const handleKeyDown = e => {
     if (e.keyCode === 13) {
-      if (!value || value.length === 0) {
-        setShowHideList(false);
-      } else if (value && cursor == -1) {
+      if (value && cursor == -1) {
         setShowHideList(false);
       } else {
-        setValue(placePredictions[cursor].description);
-        getplace(placePredictions[cursor].place_id);
+        if (placePredictions.length > 0 && cursor !== -1) {
+          setValue(placePredictions[cursor].description);
+          getplace(placePredictions[cursor].place_id);
+        }
+
         setShowHideList(false);
       }
     }
@@ -104,6 +103,11 @@ function Addressinput(props) {
     if (e.keyCode === 9) {
       if (!value || value.length === 0) {
         setShowHideList(false);
+
+        if (placePredictions.length > 0 && cursor !== -1) {
+          setValue(placePredictions[cursor].description);
+          getplace(placePredictions[cursor].place_id);
+        }
       } else if (value && cursor == -1) {
         setShowHideList(false);
       } else {
@@ -120,7 +124,7 @@ function Addressinput(props) {
     if (e.keyCode === 38 && cursor > 0) {
       if (e.keyCode === 13) {}
 
-      setCursor(cursor - 1, () => {});
+      setCursor(cursor - 1);
     } else if (e.keyCode === 40 && cursor < placePredictions.length - 1) {
       setCursor(cursor + 1);
     }
@@ -138,17 +142,15 @@ function Addressinput(props) {
     let line1 = '';
     let line2 = '';
     let line3 = '';
-    const fullAddress = formattedAddress.split(',');
-    fullAddress.pop();
-    fullAddress.pop();
-    fullAddress.pop();
+    let fullAddress = formattedAddress.split(',');
+    fullAddress = fullAddress.slice(0, fullAddress.length - 3);
     let a = true;
     let b = true;
 
     for (let i = 0; i < fullAddress.length; i++) {
-      if (line1.length + fullAddress[i].length < props.limit && a) {
+      if (line1.length + fullAddress[i].length <= props.limit && a) {
         if (line1 === '') line1 = `${fullAddress[i]}`;else line1 = `${line1},${fullAddress[i]}`;
-      } else if (line2.length + fullAddress[i].length < props.limit && b) {
+      } else if (line2.length + fullAddress[i].length <= props.limit && b) {
         a = false;
         if (line2 === '') line2 = `${fullAddress[i]}`;else line2 = `${line2},${fullAddress[i]}`;
       } else if (line3.length + fullAddress[i].length) {
@@ -166,10 +168,11 @@ function Addressinput(props) {
     addressParts.state = state ? state.long_name : '';
     addressParts.pincode = pincode ? pincode.long_name : '';
     addressParts.country = country ? country.long_name : '';
+    setValue(line1);
     return addressParts;
   };
 
-  const getplace = (place, apikey) => {
+  const getplace = place => {
     fetch(`https://api.leptonsoftware.com:9962/lepton/getplace?placeid=${place}`).then(res => res.json()).then(json => {
       setNewAddresses({
         adressParts: addresscom(json.data),
@@ -182,11 +185,21 @@ function Addressinput(props) {
     ref: showHideRef
   }, /*#__PURE__*/_react.default.createElement("label", {
     className: props.labelClass ? props.labelClass : "lable-txt"
-  }, address), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("input", {
+  }, address), /*#__PURE__*/_react.default.createElement("div", {
+    className: " css-101ldj1"
+  }, /*#__PURE__*/_react.default.createElement("input", {
+    style: {
+      maxHeight: props.maxheight ? props.maxheight : 'auto'
+    },
     onClick: () => {
+      props.setShowDropdownSetter(true);
       setClickInput(true);
     },
     ref: focusRef,
+    onFocus: () => {
+      props.setShowDropdownSetter(true);
+      setClickInput(true);
+    },
     id: "address",
     className: props.inputBoxClass ? props.inputBoxClass : "inputAutocomplete",
     value: value,
@@ -200,15 +213,18 @@ function Addressinput(props) {
       setShowHideList(true);
       setCursor(-1);
     }
-  }), /*#__PURE__*/_react.default.createElement("ul", {
+  })), /*#__PURE__*/_react.default.createElement("ul", {
+    // style={{width:width}}
     className: props.list ? props.list : "wrapper-ul"
-  }, showHideList && placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("li", {
-    className: cursor === i ? `${props.listElement} activeItem` : `${props.listElement} inactive`,
+  }, showHideList && props.showDropdown && placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("li", {
+    // style={{width:width}}
+    //className={cursor === i ? `${props.listElement} search-results-item scroll-y-xl-down` : `${props.listElement} inactive`}
+    className: cursor === i ? `search-results-item scroll-y-xl-down` : `${props.listElement} inactive`,
     key: i,
     ref: cursor == i ? testRef : inactiveTestRef,
     onClick: e => {
       setValue(item.description);
-      getplace(item.place_id, props.apikey);
+      getplace(item.place_id);
       setShowHideList(false);
     }
   }, item.description))));
@@ -218,22 +234,18 @@ function Addressinput(props) {
 
 function Companyname(props) {
   const showHideRef = (0, _react.useRef)();
-  const activeRef = (0, _react.useRef)();
-  const testRef = (0, _react.useRef)();
-  const clickRef = (0, _react.useRef)();
-  const focusRef = (0, _react.useRef)();
-  const inputTag = (0, _react.useRef)();
+  const testRef = (0, _react.useRef)(); // const focusRef = useRef();
+
   const inactiveTestRef = (0, _react.useRef)();
   const [value, setValue] = (0, _react.useState)([]);
   const [showHideList, setShowHideList] = (0, _react.useState)(true);
-  const [address, setAddress] = (0, _react.useState)("");
-  const [a, setA] = (0, _react.useState)("");
-  const [newAddresses, setNewAddresses] = (0, _react.useState)();
-  const [cursor, setCursor] = (0, _react.useState)(-1);
-  const [clickedOutside, setClickedOutside] = (0, _react.useState)(false);
+  const [address, setAddress] = (0, _react.useState)(""); // const [a, setA] = useState("");
+  // const [newAddresses, setNewAddresses] = useState(); 
+
+  const [cursor, setCursor] = (0, _react.useState)(-1); // const [clickedOutside, setClickedOutside] = useState(false); 
+
   const [width, setWidth] = (0, _react.useState)(null);
   const [placePredictions, setPlacePredictions] = (0, _react.useState)([]);
-  const [checker, setChecker] = (0, _react.useState)('');
   (0, _react.useEffect)(() => {
     const checkIfClickedOutside = e => {
       if (showHideList && showHideRef.current && !showHideRef.current.contains(e.target)) {
@@ -261,14 +273,8 @@ function Companyname(props) {
   };
 
   (0, _react.useEffect)(() => {
-    if (newAddresses != null) {
-      console.log("viiii", newAddresses);
-      props.parentCallback(newAddresses);
-    }
-  }, [newAddresses]);
-  (0, _react.useEffect)(() => {
     setAddress(props.label || 'Company Name');
-  }, props.label);
+  }, [props.label]);
   (0, _react.useEffect)(() => {
     if (testRef.current) {
       testRef.current.scrollIntoViewIfNeeded();
@@ -277,16 +283,6 @@ function Companyname(props) {
   (0, _react.useEffect)(() => {
     if (value.length < 1) setPlacePredictions('');
   }, [value]);
-
-  const handleClickOutside = e => {
-    if (!clickRef.current.contains(e.target)) {
-      setClickedOutside(true);
-    }
-  };
-
-  const handleClickInside = e => {
-    setClickedOutside(false);
-  };
 
   const handleKeyDown = e => {
     if (e.keyCode === 13) {
@@ -318,7 +314,7 @@ function Companyname(props) {
     }
 
     if (e.keyCode === 38 && cursor > 0) {
-      setCursor(cursor - 1); // console.log("38", placePredictions[cursor].company_name)
+      setCursor(cursor - 1);
 
       if (e.keyCode === 13) {}
     } else if (e.keyCode === 40 && cursor < placePredictions.length - 1) {
@@ -330,10 +326,14 @@ function Companyname(props) {
     ref: showHideRef
   }, /*#__PURE__*/_react.default.createElement("label", {
     className: props.labelClass ? props.labelClass : "lable-txt"
-  }, address), /*#__PURE__*/_react.default.createElement("br", null), /*#__PURE__*/_react.default.createElement("input", {
-    // onFocus={() => { console.log("focused") }}
-    ref: focusRef,
-    id: "companyname",
+  }, address), /*#__PURE__*/_react.default.createElement("div", {
+    className: " css-101ldj1"
+  }, /*#__PURE__*/_react.default.createElement("input", {
+    id: "companyname" // can be removed later
+    ,
+    style: {
+      maxHeight: props.maxheight ? props.maxheight : 'auto'
+    },
     className: props.inputBoxClass ? props.inputBoxClass : "inputAutocomplete",
     value: value,
     placeholder: props.placeholder ? props.placeholder : "",
@@ -344,15 +344,15 @@ function Companyname(props) {
       });
       setValue(evt.target.value);
       setShowHideList(true);
+      props.companyNameInputSetter(evt.target.value);
       setCursor(-1);
+      props.setShowDropdownSetter(false);
     }
-  }), /*#__PURE__*/_react.default.createElement("ul", {
-    style: {
-      width: width
-    },
+  })), /*#__PURE__*/_react.default.createElement("ul", {
+    // style={{ width: width }}
     className: props.list ? props.list : "wrapper-ul"
   }, showHideList && placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("li", {
-    className: cursor === i ? `${props.listElement} activeItem` : `${props.listElement} inactive`,
+    className: cursor === i ? `search-results-item` : `${props.listElement} inactive`,
     key: i,
     ref: cursor == i ? testRef : inactiveTestRef,
     onClick: e => {
