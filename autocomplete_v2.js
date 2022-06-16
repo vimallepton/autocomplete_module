@@ -75,7 +75,9 @@ function Addressinput(props) {
     }
   }, [props.searchval, clickInput]);
   (0, _react.useEffect)(() => {
-    setValue("");
+    if (props.companyNameInputTrack === "") {
+      setValue("");
+    }
   }, [props.companyNameInputTrack]);
   (0, _react.useEffect)(() => {
     setAddress(props.label || 'Company address');
@@ -178,7 +180,7 @@ function Addressinput(props) {
   const getplace = place => {
     fetch(`https://api.leptonsoftware.com:9962/lepton/getplace?placeid=${place}`).then(res => res.json()).then(json => {
       setNewAddresses({
-        adressParts: addresscom(json.data),
+        addressParts: addresscom(json.data),
         googleResponse: json.data
       });
     });
@@ -217,12 +219,9 @@ function Addressinput(props) {
       setCursor(-1);
     }
   })), /*#__PURE__*/_react.default.createElement("ul", {
-    // style={{width:width}}
     className: props.list ? props.list : "wrapper-ul"
   }, showHideList && props.showDropdown && placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("li", {
-    // style={{width:width}}
-    //className={cursor === i ? `${props.listElement} search-results-item scroll-y-xl-down` : `${props.listElement} inactive`}
-    className: cursor === i ? `search-results-item scroll-y-xl-down` : `${props.listElement} inactive`,
+    className: cursor === i ? `${props.listElement} ` : `search-results-item scroll-y-xl-down`,
     key: i,
     ref: cursor == i ? testRef : inactiveTestRef,
     onClick: e => {
@@ -237,16 +236,12 @@ function Addressinput(props) {
 
 function Companyname(props) {
   const showHideRef = (0, _react.useRef)();
-  const testRef = (0, _react.useRef)(); // const focusRef = useRef();
-
+  const testRef = (0, _react.useRef)();
   const inactiveTestRef = (0, _react.useRef)();
   const [value, setValue] = (0, _react.useState)([]);
   const [showHideList, setShowHideList] = (0, _react.useState)(true);
-  const [address, setAddress] = (0, _react.useState)(""); // const [a, setA] = useState("");
-  // const [newAddresses, setNewAddresses] = useState(); 
-
-  const [cursor, setCursor] = (0, _react.useState)(-1); // const [clickedOutside, setClickedOutside] = useState(false); 
-
+  const [address, setAddress] = (0, _react.useState)("");
+  const [cursor, setCursor] = (0, _react.useState)(-1);
   const [width, setWidth] = (0, _react.useState)(null);
   const [placePredictions, setPlacePredictions] = (0, _react.useState)([]);
   (0, _react.useEffect)(() => {
@@ -332,11 +327,7 @@ function Companyname(props) {
   }, address), /*#__PURE__*/_react.default.createElement("div", {
     className: " css-101ldj1"
   }, /*#__PURE__*/_react.default.createElement("input", {
-    id: "companyname" // can be removed later
-    ,
-    style: {
-      maxHeight: props.maxheight ? props.maxheight : 'auto'
-    },
+    id: "companyname",
     className: props.inputBoxClass ? props.inputBoxClass : "inputAutocomplete",
     value: value,
     placeholder: props.placeholder ? props.placeholder : "",
@@ -352,10 +343,12 @@ function Companyname(props) {
       props.setShowDropdownSetter(false);
     }
   })), /*#__PURE__*/_react.default.createElement("ul", {
-    // style={{ width: width }}
+    style: {
+      maxHeight: props.maxheight ? props.maxheight : 'auto'
+    },
     className: props.list ? props.list : "wrapper-ul"
   }, showHideList && placePredictions.length > 0 && placePredictions.map((item, i) => /*#__PURE__*/_react.default.createElement("li", {
-    className: cursor === i ? `search-results-item` : `${props.listElement} inactive`,
+    className: cursor === i ? `${props.listElement}` : `search-results-item`,
     key: i,
     ref: cursor == i ? testRef : inactiveTestRef,
     onClick: e => {
